@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .btn-tomato {
+    @apply bg-tomato text-white rounded-lg hover:cursor-pointer;
+  }
+}
