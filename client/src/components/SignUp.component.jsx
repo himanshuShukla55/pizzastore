@@ -1,46 +1,35 @@
-import React from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import React, { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { ImCross } from "react-icons/im";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const SignUp = () => {
-  const {
-    values: { name, email, password },
-    errors,
-    touched,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-  } = useFormik({
-    initialValues: {
-      name: "",
-      email: "",
-      password: "",
-    },
-    validationSchema: Yup.object().shape({
-      name: Yup.string()
-        .max(20, "Name length should be atmost 20!")
-        .required("Name is required!"),
-      email: Yup.string()
-        .email("Invalid Email!")
-        .required("Email is required!"),
-      password: Yup.string()
-        .min(8, "Password length should be atlest 8!")
-        .required("Password is required!"),
-    }),
-    onSubmit: (values) => {
-      console.log(values);
-    },
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: "",
   });
+  const handleChange = ({ target: { name, value } }) => {
+    setUser({ ...user, [name]: value });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("/api/users/signup", user);
+    } catch (error) {
+      console.log("error in signing up!");
+      console.error(error);
+    }
+  };
+  const { name, email, password } = user;
   return (
     <div className="absolute top-0 left-0 w-full h-full bg-gray-400/50">
       <form
         onSubmit={handleSubmit}
-        className="relative bg-white/100 max-w-[400px] flex flex-col gap-5 text-xl shadow-lg p-8 rounded-lg z-10 mx-auto mt-[13%]"
+        className="relative bg-white/100 max-w-[400px] flex flex-col gap-5 text-xl shadow-lg p-8 rounded-lg z-10 mx-auto mt-[40%] sm:mt-[13%]"
       >
         <h2 className="text-center text-3xl font-semibold text-tomato mb-10">
           Sign Up Form
@@ -55,12 +44,8 @@ const SignUp = () => {
               placeholder="Enter Name"
               value={name}
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </div>
-          {touched.name && errors.name && (
-            <p className="text-red-600 text-sm">{errors.name}</p>
-          )}
         </div>
 
         <div>
@@ -73,12 +58,8 @@ const SignUp = () => {
               placeholder="Enter Email"
               value={email}
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </div>
-          {touched.email && errors.email && (
-            <p className="text-sm text-red-600">{errors.email}</p>
-          )}
         </div>
 
         <div>
@@ -91,12 +72,8 @@ const SignUp = () => {
               placeholder="Enter Password"
               value={password}
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </div>
-          {touched.password && errors.password && (
-            <p className="text-sm text-red-600">{errors.password}</p>
-          )}
         </div>
 
         <input className="btn-tomato p-3" type="submit" value="SIGN UP" />
