@@ -7,18 +7,24 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 const SignUp = () => {
+  //form state
   const [user, setUser] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  // function to handle form state change
   const handleChange = ({ target: { name, value } }) => {
     setUser({ ...user, [name]: value });
   };
+
+  // function to submit sign up form
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post("/api/users/signup", user);
+      console.log(res);
     } catch (error) {
       console.log("error in signing up!");
       console.error(error);
