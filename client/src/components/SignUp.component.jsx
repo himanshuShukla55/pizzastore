@@ -1,36 +1,52 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { ImCross } from "react-icons/im";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const SignUp = () => {
   //form state
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
-  // function to handle form state change
-  const handleChange = ({ target: { name, value } }) => {
-    setUser({ ...user, [name]: value });
-  };
-
-  // function to submit sign up form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("/api/users/signup", user);
-      console.log(res);
-    } catch (error) {
-      console.log("error in signing up!");
-      console.error(error);
-    }
-  };
-  const { name, email, password } = user;
+  const { values, errors, touched, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      initialValues: {
+        name: "",
+        email: "",
+        password: "",
+      },
+      //form validations
+      validationSchema: Yup.object().shape({
+        name: Yup.string()
+          .required("name is required!")
+          .matches(
+            /^[A-Za-z ]{3,20}$/,
+            "name should be 3-20 characters long and should not cointain any special characters or digits!"
+          ),
+        email: Yup.string()
+          .required("Email is required")
+          .email("Enter a valid email address!"),
+        password: Yup.string()
+          .required("password is required!")
+          .matches(
+            /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[$@!&%])[A-Za-z0-9$@!&%]{8,}$/,
+            "password length should be atleast 8, should have one capital, small and special {@,$,%,&,!} character, should not contain white spaces!"
+          ),
+      }),
+      //function to handle form submit
+      onSubmit: async (values) => {
+        try {
+          const res = await axios.post("/api/users/signup", values);
+          console.log(res);
+        } catch (error) {
+          console.log("error in signing up!");
+          console.error(error);
+        }
+      },
+    });
+  const { name, email, password } = values;
   return (
     <div className="absolute top-0 left-0 w-full h-full bg-gray-400/50">
       <form
@@ -50,8 +66,12 @@ const SignUp = () => {
               placeholder="Enter Name"
               value={name}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
           </div>
+          {touched.name && errors.name && (
+            <p className="text-sm text-red-600">{errors.name}</p>
+          )}
         </div>
 
         <div>
@@ -64,8 +84,12 @@ const SignUp = () => {
               placeholder="Enter Email"
               value={email}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
           </div>
+          {touched.email && errors.email && (
+            <p className="text-sm text-red-600">{errors.email}</p>
+          )}
         </div>
 
         <div>
@@ -78,8 +102,12 @@ const SignUp = () => {
               placeholder="Enter Password"
               value={password}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
           </div>
+          {touched.password && errors.password && (
+            <p className="text-sm text-red-600">{errors.password}</p>
+          )}
         </div>
 
         <input className="btn-tomato p-3" type="submit" value="SIGN UP" />
