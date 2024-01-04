@@ -3,12 +3,14 @@ import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { ImCross } from "react-icons/im";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 const SignUp = () => {
+  //navigate
+  const navigate = useNavigate();
   //form state
   const { values, errors, touched, handleChange, handleSubmit, handleBlur } =
     useFormik({
@@ -36,10 +38,11 @@ const SignUp = () => {
           ),
       }),
       //function to handle form submit
-      onSubmit: async (values) => {
+      onSubmit: async (values, { resetForm }) => {
         try {
           const res = await axios.post("/api/users/signup", values);
-          console.log(res);
+          resetForm({ values: { name: "", email: "", password: "" } });
+          navigate("/login");
         } catch (error) {
           console.log("error in signing up!");
           console.error(error);
